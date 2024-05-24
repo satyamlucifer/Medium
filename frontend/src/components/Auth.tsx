@@ -1,6 +1,6 @@
 import { SignupType } from "@satyamdeveloper/medium-common";
-import { ChangeEvent, ChangeEventHandler, MouseEventHandler, useState } from "react"
-import { Link, Navigate, useNavigate } from "react-router-dom"
+import { ChangeEvent, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
 import { BACKEND_URL } from "../config";
 
