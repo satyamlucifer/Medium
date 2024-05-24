@@ -17,9 +17,10 @@ export const blogRouter = new Hono<
   }>()
 
   blogRouter.use('/*', async (c, next) => {
-    const token = c.req.header("authorization") || "";
-    const header = token.split(" ")[1]
-    const response = await verify(header, c.env.JWT_SECRET_KEY)
+    const token = c.req.header("Authorization") || "";
+    console.log(token);
+    // const header = token.split(" ")[1]
+    const response = await verify(token, c.env.JWT_SECRET_KEY)
     if (response.id) {
       c.set('id',response.id)
       await next()
@@ -75,8 +76,6 @@ export const blogRouter = new Hono<
   })
   blogRouter.get('/', async (c) => {
 
-    const body = await c.req.json();
-
     try{
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
@@ -85,6 +84,17 @@ export const blogRouter = new Hono<
     const blog = await prisma.post.findFirst({
         where: {
             id: c.req.query('id')
+        },select:{
+          content:true,
+          title:true,
+          id:true,
+          authorId:true,
+          author:{
+            select:{
+              name:true,
+              id:true
+            }
+          }
         }})
 
     return c.json({blog})}
@@ -99,7 +109,20 @@ export const blogRouter = new Hono<
         datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate());
 
-    const blog = await prisma.post.findMany();
+    const blog = await prisma.post.findMany(
+      {select:{
+        content:true,
+        title:true,
+        id:true,
+        authorId:true,
+        author:{
+          select:{
+            name:true,
+            id:true
+          }
+        }
+      }}
+    );
     return c.json({blog})
   })
   
